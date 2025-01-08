@@ -21,14 +21,12 @@ You can read more about the importance of sandboxing, containers vs VMs, and mor
   - [Quickstart - VSCode and Foundry on a new project, unmounted](#quickstart---vscode-and-foundry-on-a-new-project-unmounted)
 - [Usage](#usage)
   - [VSCode](#vscode)
+    - [Unmounted](#unmounted)
     - [Mounted](#mounted)
     - [Using on an existing project](#using-on-an-existing-project)
   - [Raw Docker](#raw-docker)
     - [Mounted](#mounted-1)
     - [Using on an existing project](#using-on-an-existing-project-1)
-  - [Adding new projects](#adding-new-projects)
-  - [Adding new tools/Dockerfiles/containers](#adding-new-toolsdockerfilescontainers)
-- [License](#license)
 - [Acknowledgements](#acknowledgements)
 
 ## Why are dev containers important?
@@ -91,7 +89,7 @@ cd web3-dev-containers
 
 ## Quickstart - VSCode and Foundry on a new project, unmounted
 
-Please see [VSCode](#VSCode) or [Raw Docker](#Raw-Docker) for more detailed instructions.
+Please see [VSCode](#VSCode) or [Raw Docker](#Raw-Docker) for more instructions.
 
 > **Note**  
 > `unmounted`: This means that all the code we work with will be destroyed once we stop the container. This is the safest way to work with code. There are times when we want to save our code, you can see those instructions in the `mounted` section in the [Usage](#Usage) section.
@@ -157,22 +155,71 @@ This will delete all traces of the code you worked on in that container!
 
 ## VSCode
 
-Please see the [Quickstart](#Quickstart---VSCode-and-Foundry-on-a-new-project) for a quick guide on how to use this with VSCode on a new project.
+### Unmounted
+
+Please see the [Quickstart](#Quickstart---VSCode-and-Foundry-on-a-new-project-unmounted) for a quick guide on how to use this with VSCode on a new project.
 
 ### Mounted
 
+If you want to persist your code changes back to your host machine, take these steps instead of what you saw in the quickstart:
+
+1. Open the `foundry/mounted` folder in VSCode
+2. Run `Dev Containers: Reopen in Container` from the command palette
+3. Work in the `projects` folder - any changes here will be saved to your host machine
+4. The container will still protect you from malicious scripts, but be careful what you save back to your machine
+
+> **Note**
+> The code will be saved to your host machine's file structure, so just remember to not run anything from that folder before you're sure it's safe!
+
 ### Using on an existing project
+
+To use these containers with an existing project:
+
+1. Copy the `.devcontainer` folder to your project (mounted or unmounted):
+
+```bash
+cp -r web3-dev-containers/foundry/MOUNTED_UNMOUNTED/.devcontainer /path/to/your/project/
+```
+
+2. Open your project's folder in VSCode
+
+3. Open in a new dev container
+   
+Run `Dev Containers: Reopen in Container` 
 
 ## Raw Docker
 
+For users who are not using VSCode.
+
 ### Mounted
+
+To run on a mounted volume:
+
+```bash
+# Build the container
+cd foundry/mounted/.devcontainer
+docker build -t foundry-dev .
+
+# Run with your project mounted
+docker run -it -v /path/to/your/project:/workspace/projects foundry-dev
+```
 
 ### Using on an existing project
 
-## Adding new projects
+1. Build the container:
 
-## Adding new tools/Dockerfiles/containers
+```bash
+cd web3-dev-containers/foundry
+docker build -t foundry-dev .
+```
 
-# License
+2. Run your project in the container
+
+```bash
+docker run -it foundry-dev
+cd workspace
+git clone your-project-url
+```
 
 # Acknowledgements
+- [The Red Guild](https://blog.theredguild.org/where-do-you-run-your-code/)
