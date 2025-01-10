@@ -221,5 +221,11 @@ cd workspace
 git clone your-project-url
 ```
 
+# Docker container security issues to look out for
+
+Running a docker container is not a panacea! There are a lot of things to consider when working with Docker containers.
+
+- [Here is a list](https://medium.com/@ksaquib/are-your-docker-containers-really-safe-essential-security-tips-you-need-to-know-243dfd11a384)
+
 # Acknowledgements
 - [The Red Guild](https://blog.theredguild.org/where-do-you-run-your-code/)
