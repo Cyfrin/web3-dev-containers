@@ -225,7 +225,18 @@ git clone your-project-url
 
 Running a docker container is not a panacea! There are a lot of things to consider when working with Docker containers.
 
-- [Here is a list](https://medium.com/@ksaquib/are-your-docker-containers-really-safe-essential-security-tips-you-need-to-know-243dfd11a384)
+For example:
+
+Network Access:
+- Container has full network access, so they could do things like try to send information about your docker container out
+
+Mount Points:
+- If you're using mounted files, malware can read everything in your files
+
+Resource Limits:
+- No memory/CPU restrictions could mean the malware could try crash your computer
+
+[Here is a list of more considerations](https://medium.com/@ksaquib/are-your-docker-containers-really-safe-essential-security-tips-you-need-to-know-243dfd11a384)
 
 # Acknowledgements
 - [The Red Guild](https://blog.theredguild.org/where-do-you-run-your-code/)
