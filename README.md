@@ -4,7 +4,7 @@
 
 A repo to help you run code in a safer manner in the web3 ecosystem. You open up your code in an isolated docker environment so you have a smaller chance of getting hacked.
 
-*Important: This isn't a fail-safe!* 
+*Important: This isn't a fail-safe! There is no 100% secure way to run code you are unfamiliar with. But running code in an isolated environment is at least much better.* 
 
 You can read more about the importance of sandboxing, containers vs VMs, and more in the [Red Guild Blog](https://blog.theredguild.org/where-do-you-run-your-code/).
 
@@ -28,6 +28,7 @@ You can read more about the importance of sandboxing, containers vs VMs, and mor
     - [Mounted](#mounted-1)
     - [Using on an existing project](#using-on-an-existing-project-1)
 - [Acknowledgements](#acknowledgements)
+- [Security considerations](#security-considerations)
 
 ## Why are dev containers important?
 
@@ -121,9 +122,9 @@ You should get opened up into a new window that looks like this:
     <br />
 </p>
 
-3. Clone your project into the `projects` folder
+You should be at `/workspace` folder. 
 
-You should be at `/workspace`. 
+3. You can then clone a project into the `projects` folder and start working on it
 
 ```bash
 git clone https://github.com/Cyfrin/foundry-fund-me-cu # Example project
@@ -132,11 +133,11 @@ forge build
 forge test
 ```
 
-This will clone the project into the `projects` folder and you can start working with your projects, knowing that scripts are isloated to this dev container!
+Now, you can start working on the project knowing you're in a safer environment!
 
 4. Tear down
 
-When you're done, you can delete the docker container in your docker dashboard, or run `docker ps` to get the container ID and run `docker stop <container-id>` to stop the container.
+When you're done, you can delete the docker container in your docker dashboard, or run `docker ps` *on your host machine, not inside your dev container* to get the container ID and run `docker stop <container-id>` to stop the container.
 
 To do it via the CLI, back on your host machine run:
 
@@ -240,3 +241,15 @@ Resource Limits:
 
 # Acknowledgements
 - [The Red Guild](https://blog.theredguild.org/where-do-you-run-your-code/)
+
+# Security considerations
+
+Using a dev container is not a 100% secure way to run code you are unfamiliar with. It is a safer way to run code, but it is not foolproof. You may still want to be nervous about running code you're unfamiliar with! There are a number of exploits to be aware of, including:
+
+- Network access: Unless you restrict network access in your docker container, it can still access the internet. This means it can still send data to a remote server.
+- Resource constraints: Docker containers can still use up all your CPU and memory if you're not careful. You can also adjust your `Dockerfile` to account for these.
+- Docker escape exploits: There can still be ways to escape a docker container and access your host machine. These are rare, but they do exist.
+
+There are a few things to consider that we've more or less covered for you in this repo, but important to know:
+- Never run a docker container with a `root` user, this is why we use the `vscode` user in the `Dockerfile`
+- Volume mounting: If you mount a volume from your host machine, the container can access your host machine's files. Be careful what you mount! This is why the default here is `unmounted`
