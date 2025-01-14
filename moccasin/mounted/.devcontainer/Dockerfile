@@ -26,6 +26,7 @@ RUN echo 'export PATH="/home/vscode/.cargo/bin:$PATH"' >> ~/.zshrc
 
 # Install tools using uv
 RUN uv tool install moccasin
+RUN uv tool install vyper
 
 # Clean up
 RUN sudo apt-get autoremove -y && sudo apt-get clean -y
