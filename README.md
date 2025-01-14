@@ -27,6 +27,7 @@ You can read more about the importance of sandboxing, containers vs VMs, and mor
   - [Raw Docker](#raw-docker)
     - [Mounted](#mounted-1)
     - [Using on an existing project](#using-on-an-existing-project-1)
+  - [Github - Codespaces](#github---codespaces)
 - [Acknowledgements](#acknowledgements)
 - [Security considerations](#security-considerations)
 
@@ -221,6 +222,16 @@ docker run -it foundry-dev
 cd workspace
 git clone your-project-url
 ```
+
+## [Github - Codespaces](https://github.com/features/codespaces)
+
+- Every github account has access to [codespaces](https://github.com/features/codespaces), which are fundamentally `dev containers` with full [customizability](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/adding-a-dev-container-configuration/introduction-to-dev-containers) which are ethereal. 
+- The online code editor is a full working version of vscode with access to all its extensions and features. You have to familiarize yourself with _port forwarding_ and _changing port visibility_ , for any web related development.
+- The free tier [specs](https://docs.github.com/en/billing/managing-billing-for-your-products/managing-billing-for-github-codespaces/about-billing-for-github-codespaces) are excellent for testing unrecognized code, and a paid github account offers more free hours. 
+- The only disadvantage being that the code will be hosted on github's infrastructure. But you can always download the repo and then destroy the online repository or make it private. 
+- The `pr` which was merged for this section was done in `codespaces` using github's [`web code editor`](https://docs.github.com/en/codespaces/the-githubdev-web-based-editor), ie., 100% online development. 
+- This is yet another alternative for research/testing. 
+
 
 # Docker container security issues to look out for
 
