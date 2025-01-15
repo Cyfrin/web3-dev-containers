@@ -205,6 +205,17 @@ docker build -t foundry-dev .
 docker run -it -v /path/to/your/project:/workspace/projects foundry-dev
 ```
 
+### Unmountd
+
+```bash
+# Build the container
+cd foundry/unmounted/.devcontainer
+docker build -t foundry-dev-unmounted .
+
+# Run container with isolated filesystem
+docker run -it foundry-dev-unmounted
+```
+
 ### Using on an existing project
 
 1. Build the container:
