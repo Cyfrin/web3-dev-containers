@@ -79,6 +79,11 @@ The container provides a disposable, isolated environment where you can more saf
 - [VSCode](https://code.visualstudio.com/)
 - DevContainer extension by MS: `ms-vscode-remote.remote-containers`
 
+### Windows Users
+- [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)
+
+*Windows users should additionally have [this post](https://code.visualstudio.com/blogs/2020/07/01/containers-wsl) for more context*
+
 ## Installation
 
 Please see [VSCode](#VSCode) or [Raw Docker](#Raw-Docker) for more detailed instructions.
