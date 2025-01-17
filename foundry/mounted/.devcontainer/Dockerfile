@@ -34,7 +34,7 @@ RUN curl -L https://foundry.paradigm.xyz | zsh
 RUN foundryup
 
 # Aderyn
-RUN curl -L https://raw.githubusercontent.com/Cyfrin/aderyn/refs/heads/feat/more-robust-installer/cyfrinup/install | zsh
+RUN curl -L https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | zsh
 RUN cyfrinup
 
 # Clean up
