@@ -13,6 +13,15 @@ SHELL ["/usr/bin/zsh", "-c"]
 # Dropping privileges
 USER vscode
 
+# Install dependencies for Homebrew
+RUN sudo apt-get install -y curl git build-essential
+
+# Install Homebrew
+RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Add Homebrew to PATH
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
+
 # Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source $HOME/.cargo/env
 
@@ -33,9 +42,11 @@ RUN uv tool install crytic-compile
 RUN curl -L https://foundry.paradigm.xyz | zsh
 RUN foundryup
 
-# Aderyn
-RUN curl -L https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | zsh
-RUN cyfrinup
+# Install Aderyn using Homebrew
+RUN brew install cyfrin/tap/aderyn
+
+# Verify Aderyn installation
+RUN aderyn --version
 
 # Clean up
 RUN sudo apt-get autoremove -y && sudo apt-get clean -y
