@@ -21,7 +21,7 @@
                 "NomicFoundation.hardhat-solidity",
                 "tintinweb.solidity-visual-auditor",
                 "trailofbits.weaudit",
-                "tintinweb.solidity-metrics",
+                "tintinweb.solidity-metrics"
             ],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "zsh",
