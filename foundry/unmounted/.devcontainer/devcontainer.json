@@ -22,11 +22,6 @@
                 "tintinweb.solidity-visual-auditor",
                 "trailofbits.weaudit",
                 "tintinweb.solidity-metrics",
-                "eamodio.gitlens",
-                "mhutchie.git-graph",
-                "GitHub.copilot",
-                "GitHub.copilot-chat",
-                "tamasfe.even-better-toml"
             ],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "zsh",
