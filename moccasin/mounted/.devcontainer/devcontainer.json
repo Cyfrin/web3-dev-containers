@@ -43,7 +43,7 @@
     // Use 'postCreateCommand' to run commands after the container is created.
     // We're using a gist, but you can also reference the raw install-tool from your repo.
     // Unless you mount the scripts folder as
-    "postCreateCommand": "echo Welcome to Cyfrin's dev-container. If you'd like to build your own, you can check out an article The Red Guild have created for you at their blog under https://blog.theredguild.org/where-do-you-run-your-code;zsh"
+    "postCreateCommand": "echo Welcome to Cyfrin's dev-container. If you'd like to build your own, you can check out an article The Red Guild have created for you at their blog under https://blog.theredguild.org/where-do-you-run-your-code"
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
     // "remoteUser": "root"
 }
