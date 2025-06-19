@@ -1,4 +1,4 @@
-# Base debian build (latest).
+# Base ubuntu build (latest).
 FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu
 
 # Update packages.
@@ -16,20 +16,12 @@ USER vscode
 # Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source $HOME/.cargo/env
 
-# Install nvm, yarn, npm, pnpm
-# RUN curl -o- https://raw.githubusercontent.com/devcontainers/features/main/src/node/install.sh | sudo bash
-
-# Install uv and add to PATH
-# See https://docs.astral.sh/uv/guides/integration/docker/
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-ENV PATH="/home/vscode/.local/bin:$PATH"
-
 # Add uv to shell configuration
 RUN echo 'export PATH="/home/vscode/.cargo/bin:$PATH"' >> ~/.zshrc
 
 # Add Sui Move
 RUN curl -sSfL https://raw.githubusercontent.com/Mystenlabs/suiup/main/install.sh | sh
-RUN yes | suiup install sui
+RUN yes | /home/vscode/.local/bin/suiup install sui
 
 # Clean up
 RUN sudo apt-get autoremove -y && sudo apt-get clean -y
