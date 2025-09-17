@@ -33,6 +33,8 @@ RUN uv tool install crytic-compile
 RUN curl -L https://foundry.paradigm.xyz | zsh
 RUN foundryup
 
+RUN echo 'export PATH="/home/vscode/.foundry/bin:$PATH"' >> ~/.zshrc
+
 # Aderyn
 RUN curl -L https://raw.githubusercontent.com/Cyfrin/up/main/install | zsh
 RUN cyfrinup
