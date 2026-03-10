@@ -45,7 +45,7 @@ Imagine you're auditing a suspicious smart contract and it has a `package.json` 
 }
 ```
 
-If you run npm install on your host machine, you'll essentailly be running a bash script from a random website on your machine! It could do things like:
+If you run npm install on your host machine, you'll essentially be running a bash script from a random website on your machine! It could do things like:
 - The script could steal your private keys from `~/.ssh`
 - Steal encrypted keys from `~/.foundry`
 - Install malware somewhere in your files
@@ -113,7 +113,7 @@ code ./foundry/unmounted # If you have the `code` terminal command installed
 
 2. Run `Dev Containers: Reopen in Container` from the command palette
 
-To get to the command pallette, you can use the following shortcuts:
+To get to the command palette, you can use the following shortcuts:
 - Windows/Linux: `Ctrl+Shift+P`
 - macOS: `Cmd+Shift+P`
 
@@ -210,7 +210,7 @@ docker build -t foundry-dev .
 docker run -it -v /path/to/your/project:/workspace/projects foundry-dev
 ```
 
-### Unmountd
+### Unmounted
 
 ```bash
 # Build the container

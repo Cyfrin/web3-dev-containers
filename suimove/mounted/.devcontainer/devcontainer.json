@@ -1,0 +1,51 @@
+{
+    // Inspired by https://blog.theredguild.org/where-do-you-run-your-code/
+    // For format details, see https://aka.ms/devcontainer.json.
+    "name": "Cyfrin's Sui Move DevContainer",
+  
+    // You can use image or directly use a Dockerfile or Docker Compose file.
+    // More info: https://containers.dev/guide/dockerfile
+    // https://github.com/devcontainers/images/tree/main/src/base-alpine
+    // "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "build": {
+      "dockerfile": "Dockerfile"
+    },
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    "features": {
+    },
+  
+  // Configure tool-specific properties.
+    "customizations": {
+    // Configure properties specific to VS Code.
+      "vscode": {
+        "extensions": [
+          "mysten.move",
+          "damirka.move-syntax"
+        ],
+        "settings": {
+          "terminal.integrated.defaultProfile.linux": "zsh",
+          "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
+        }
+      }
+    },
+  
+  
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [3000],
+  
+  // Use 'portsAttributes' to set default properties for specific forwarded ports. 
+  // More info: https://containers.dev/implementors/json_reference/#port-attributes
+  // "portsAttributes": {
+  // 	"3000": {
+  // 	  "label": "Hello Remote World",
+  // 	  "onAutoForward": "notify"
+  // 	}
+  // },
+  
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // We're using a gist, but you can also reference the raw install-tool from your repo.
+  // Unless you mount the scripts folder as
+  "postCreateCommand": "echo Welcome to Cyfrin's dev-container. If you'd like to build your own, you can check out an article The Red Guild have created for you at their blog under https://blog.theredguild.org/where-do-you-run-your-code"
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+}
