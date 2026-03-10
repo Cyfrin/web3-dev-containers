@@ -1,7 +1,7 @@
 {
     // Inspired by https://blog.theredguild.org/where-do-you-run-your-code/
     // For format details, see https://aka.ms/devcontainer.json.
-    "name": "Cyfrin's Vyper & Moccasin DevContainer",
+    "name": "Cyfrin's JavaScript DevContainer",
     // You can use image or directly use a Dockerfile or Docker Compose file.
     // More info: https://containers.dev/guide/dockerfile
     // https://github.com/devcontainers/images/tree/main/src/base-alpine
@@ -9,17 +9,15 @@
     "build": {
         "dockerfile": "Dockerfile"
     },
+    "workspaceMount": "type=tmpfs,target=/workspace",
+    "workspaceFolder": "/workspace",
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {},
     // Configure tool-specific properties.
     "customizations": {
         // Configure properties specific to VS Code.
         "vscode": {
-            "extensions": [
-                "tintinweb.vscode-vyper",
-                "trailofbits.weaudit",
-                "ms-python.python"
-            ],
+            "extensions": [],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "zsh",
                 "terminal.integrated.profiles.linux": {
@@ -32,7 +30,7 @@
     },
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [3000],
-    // Use 'portsAttributes' to set default properties for specific forwarded ports. 
+    // Use 'portsAttributes' to set default properties for specific forwarded ports.
     // More info: https://containers.dev/implementors/json_reference/#port-attributes
     // "portsAttributes": {
     // 	"3000": {
