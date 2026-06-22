@@ -5,7 +5,6 @@ Runs once on container creation (via ``postCreateCommand``) to:
 - bypass Claude Code's onboarding wizard when an auth token is present,
 - enable ``bypassPermissions`` and deny reads of ``.devcontainer``,
 - write a tmux config with large scrollback,
-- repair ownership of named volumes that mount as root,
 - provide a container-local git config without mutating the host's.
 
 Derived from Trail of Bits' claude-code-devcontainer (MIT).

@@ -27,15 +27,12 @@
   "mounts": [
     "source=devc-${localWorkspaceFolderBasename}-claude-history-${devcontainerId},target=/commandhistory,type=volume",
     "source=devc-${localWorkspaceFolderBasename}-claude-config-${devcontainerId},target=/home/vscode/.claude,type=volume",
-    "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly",
-    "source=${localWorkspaceFolder}/.git/config,target=/workspace/.git/config,type=bind,readonly",
-    "source=${localWorkspaceFolder}/.git/hooks,target=/workspace/.git/hooks,type=bind,readonly"
+    "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly"
   ],
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
     "GIT_CONFIG_GLOBAL": "/home/vscode/.gitconfig.local",
     "SSH_AUTH_SOCK": ""
   },
-  "initializeCommand": "bash -c 'git -C \"${localWorkspaceFolder}\" init -q 2>/dev/null || true'",
   "postCreateCommand": "uv run --no-project /opt/post_install.py; echo 'Cyfrin Claude dev container ready (no credentials). Run: claude login — https://www.cyfrin.io/blog/reduce-the-risk-of-cyber-attacks-isolated-dev-environments'"
 }

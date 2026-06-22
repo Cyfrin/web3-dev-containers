@@ -50,14 +50,16 @@ list_stacks() {
 # Strip // line comments so jq can read a devcontainer.json (JSONC).
 strip_jsonc() { sed '/^[[:space:]]*\/\//d' "$1"; }
 
-# Refuse SYS_ADMIN: it would let code remount the read-only mounts and flush
-# the firewall, defeating the entire hardening model.
+# Refuse dangerous runArgs that defeat the hardening: SYS_ADMIN lets code remount
+# the RO mounts and flush the firewall; --privileged and seccomp/apparmor=unconfined
+# are equivalent. Fails CLOSED - an unparseable config is refused, not waved through.
 guard_no_sys_admin() {
-  local json="$1"
-  if strip_jsonc "$json" |
-    jq -e '(.runArgs // []) | map(select(test("SYS_ADMIN"))) | length > 0' \
-      >/dev/null 2>&1; then
-    die "SYS_ADMIN found in runArgs - refusing (it defeats the hardening)."
+  local json="$1" args
+  if ! args="$(strip_jsonc "$json" | jq -r '(.runArgs // []) | join(" ") | ascii_downcase' 2>/dev/null)"; then
+    die "could not parse $json runArgs - refusing (fail closed)."
+  fi
+  if printf '%s' "$args" | grep -Eq 'sys_admin|privileged|unconfined'; then
+    die "dangerous runArgs (SYS_ADMIN / privileged / unconfined) - refusing; defeats the hardening."
   fi
 }
 
@@ -111,12 +113,13 @@ scaffold() {
       >"$dc/devcontainer.json"
 }
 
-jq_edit() { # jq_edit <file> <filter> [args...]
+jq_edit() { # jq_edit <file> <filter> [jq-args...]
   local file="$1" filter="$2"
   shift 2
   local tmp
   tmp="$(mktemp)"
-  jq "$@" "$filter" "$file" >"$tmp"
+  # Strip JSONC comments first so this is safe on hand-copied template configs.
+  strip_jsonc "$file" | jq "$@" "$filter" >"$tmp"
   mv "$tmp" "$file"
 }
 
@@ -145,20 +148,25 @@ apply_flags() {
       shift
       ;;
     --mount)
-      [[ $# -ge 2 ]] || die "--mount needs <host:container>"
+      [[ $# -ge 2 ]] || die "--mount needs <host>:<container>"
+      local msrc="${2%%:*}" mdst="${2#*:}"
+      [[ "$2" == *:* && -n "$msrc" && -n "$mdst" && "$mdst" != *:* ]] ||
+        die "--mount needs <host>:<container> (single ':', absolute container path)"
       jq_edit "$json" '.mounts = ((.mounts // []) + [$m])' \
-        --arg m "source=${2%%:*},target=${2##*:},type=bind"
-      enabled+=("mount(${2})")
+        --arg m "source=$msrc,target=$mdst,type=bind"
+      enabled+=("mount($msrc->$mdst)")
       shift 2
       ;;
     --rpc)
       [[ $# -ge 2 ]] || die "--rpc needs <url>"
-      host="$(printf '%s' "$2" | sed -E 's#^[a-z]+://##; s#/.*$##; s#:.*$##')"
+      host="$(printf '%s' "$2" | sed -E 's#^[a-zA-Z][a-zA-Z0-9+.-]*://##; s#^[^/@]*@##; s#/.*$##; s#:[0-9]+$##')"
+      [[ -n "$host" ]] || die "--rpc: could not parse a host from the URL"
       allow_hosts+=("$host")
       shift 2
       ;;
     --allow)
       [[ $# -ge 2 ]] || die "--allow needs <host>"
+      [[ "$2" == *[[:space:]]* ]] && die "--allow: one host per flag, no whitespace"
       allow_hosts+=("$2")
       shift 2
       ;;
@@ -214,16 +222,23 @@ cmd_create() {
 
   local target
   if [[ -n "$name" ]]; then
-    mkdir -p "$name"
-    target="$(cd "$name" && pwd)"
+    mkdir -p -- "$name"
+    target="$(cd -- "$name" && pwd)"
   elif [[ "$mode" == "unmounted" ]]; then
     target="$(mktemp -d "${TMPDIR:-/tmp}/lair-$stack.XXXXXX")"
   else
     die "mounted needs a project name: lair mounted $stack <name>"
   fi
 
-  if [[ -d "$target/.devcontainer" ]]; then
-    warn "$target/.devcontainer already exists; overwriting template files"
+  if [[ -d "$target/.devcontainer" && -z "${LAIR_FORCE:-}" ]]; then
+    if [[ -t 0 ]]; then
+      local reply
+      printf '[lair] %s/.devcontainer exists. Overwrite template files? [y/N] ' "$target"
+      read -r reply
+      [[ "$reply" =~ ^[Yy]$ ]] || die "aborted"
+    else
+      die "$target/.devcontainer exists; set LAIR_FORCE=1 to overwrite"
+    fi
   fi
 
   log "scaffolding $mode/$stack -> $target"
@@ -236,8 +251,11 @@ cmd_create() {
 # shellcheck disable=SC2016  # jq filter: ${localWorkspaceFolder} is a devcontainer var
 cmd_allow() {
   [[ $# -ge 1 ]] || die "usage: lair allow <host> [host...]"
-  local dc="$PWD/.devcontainer"
+  local dc="$PWD/.devcontainer" h
   [[ -d "$dc" ]] || die "no .devcontainer here; run lair from a project dir"
+  for h in "$@"; do
+    [[ "$h" == *[[:space:]]* ]] && die "allow: one host per arg, no whitespace"
+  done
   printf '%s\n' "$@" >>"$dc/allowed-domains.txt"
   require_jq
   if ! strip_jsonc "$dc/devcontainer.json" |

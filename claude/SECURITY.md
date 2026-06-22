@@ -18,9 +18,13 @@ patterns adapted from
 - **`unmounted`** — workspace is an in-memory `tmpfs`. Nothing persists; destroy the
   container and it's gone. Strongest isolation; use it for reviewing untrusted code.
 - **`mounted`** — your project folder is bind-mounted read-write so work persists.
-  `.git/hooks`, `.git/config`, and `.devcontainer/` are re-mounted **read-only** so
-  code in the container can't plant a host-side git hook or rewrite the container
-  config.
+  `.devcontainer/` is re-mounted **read-only** (a real mountpoint, so the container
+  can't rewrite its own build/config for the next rebuild). But the project is
+  read-write, so a malicious repo can still plant files that execute on your **host**
+  later — git hooks, `package.json` install scripts, `Makefile`/`justfile`, `.envrc`
+  (direnv runs on `cd`), `.vscode/tasks.json` (`runOn: folderOpen`). A read-write
+  bind mount cannot prevent this. **For untrusted code, use `unmounted`** (no host
+  bind → none of these vectors exist).
 
 ## Default posture: nothing you didn't ask for
 
@@ -91,15 +95,17 @@ so `claude login` works.
 ## Network firewall
 
 `init-firewall.sh` runs at container start (via the scoped sudoers rule) and sets a
-default-deny egress policy. Allowed by default:
+default-deny egress policy that **fails closed** — any error during setup drops all
+egress rather than leaving it open. Allowed by default:
 
 - **Anthropic:** `api.anthropic.com`, `claude.ai`, `console.anthropic.com`, `statsig.anthropic.com`
 - **Registries:** `registry.npmjs.org`, `pypi.org`, `files.pythonhosted.org`
-- **GitHub:** `github.com`, `raw.githubusercontent.com`, `objects.githubusercontent.com`, `codeload.github.com`, plus GitHub's published IP ranges
-- DNS (53) and loopback
+- **GitHub:** `github.com`, `raw.githubusercontent.com`, `objects.githubusercontent.com`, `codeload.github.com`, plus GitHub's `api`/`git` IP ranges (the `.web`/Pages range is excluded so it can't be used as an exfil target)
+- **DNS** only to the resolver(s) in `/etc/resolv.conf` (not arbitrary hosts — blocks DNS tunneling), plus loopback
 
 Only **ports 80 and 443** are allowed to allowlisted hosts — which is what blocks
-outbound **SSH (port 22)** and everything else by default.
+outbound **SSH (port 22)** and everything else by default. **IPv6 is sealed
+entirely** (the allowlist is IPv4-only, so all v6 egress is dropped).
 
 ### Blockchain RPC (Alchemy, Infura, your own node)
 
@@ -141,7 +147,12 @@ trusted work — but understand it **voids the egress guarantee**.
 - **Exfil to allowlisted hosts** — the firewall can't tell good GitHub traffic from
   bad. Fewer allowlist entries = smaller surface.
 - **Claude token once authed** — after `claude login` / `--auth` the token is in the
-  container; the firewall keeps it from leaving to non-Anthropic hosts.
+  container; the firewall keeps it from leaving to non-Anthropic hosts. On `mounted`,
+  this session also persists into the per-project `~/.claude` volume (survives
+  rebuilds) — remove the volume to purge it.
+- **Mounted = host writes** — a read-write bind can't stop a repo from planting
+  host-executed files (git hooks, install scripts, `.envrc`, editor tasks); use
+  `unmounted` for untrusted code.
 - **Not a guarantee** — per Anthropic, devcontainers don't stop a determined
   malicious project from misusing what the container can reach. Treat the container
   as compromisable; keep nothing sensitive in it.
