@@ -66,8 +66,8 @@ headless CLI with no flags.**
 
 ## Credentials (opt-in)
 
-Everything below is **off by default**. The `lair` CLI (Phase 3, not yet built) will
-expose these as flags; until then, use the manual equivalent.
+Everything below is **off by default**. The `lair` CLI exposes these as flags
+(`--ssh`/`--sudo` are still manual — Phase 3.1); the manual equivalent is shown too.
 
 | Opt-in | Grants | Risk | Manual equivalent today |
 |--------|--------|------|-------------------------|
@@ -118,8 +118,8 @@ etc. will fail until you allowlist the provider's host. Two things to know:
 Change the allowlist from the **host** (trusted), then restart the container:
 
 ```bash
-lair allow eth-mainnet.g.alchemy.com    # Phase 3
-# today: append the host to /etc/devcontainer/allowed-domains.txt, then rebuild
+lair allow eth-mainnet.g.alchemy.com    # appends to .devcontainer/allowed-domains.txt
+lair rebuild                            # apply it
 ```
 
 The allowlist file is **root-owned and not writable by `vscode`**, and the scoped
