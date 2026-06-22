@@ -2,3 +2,10 @@
 **/projects/*
 !**/projects/.gitkeep
 .DS_Store
+
+# Local reference clone (Trail of Bits' claude-code-devcontainer), not part of this repo
+claude-code-devcontainer/
+
+# Python artifacts
+__pycache__/
+*.pyc
