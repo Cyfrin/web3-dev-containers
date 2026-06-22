@@ -133,7 +133,9 @@ lair mounted claude p --gh     # GitHub CLI + auth
 lair mounted claude p --rpc https://eth-mainnet.g.alchemy.com/v2/KEY   # allowlist an RPC host
 ```
 
-For untrusted code, prefer **`unmounted`** (the default) and the CLI over the VS Code app — the full rationale and complete flag catalog are in [`claude/SECURITY.md`](./claude/SECURITY.md). Today `claude` is the only `lair`-ready stack.
+For untrusted code, prefer **`unmounted`** (the default) and the CLI over the VS Code app. More opt-ins (`--git-ro`, `--ssh`, `--sudo`, `--mount`, `--git-identity`) and the full rationale live in [`claude/SECURITY.md`](./claude/SECURITY.md). The `claude` stack's pinned base image, tools, and Foundry version are kept current automatically by [Renovate](https://docs.renovatebot.com).
+
+> **Stack status:** Only `claude` is hardened and `lair`-ready today. The other stacks documented below (`foundry`, `javascript`, `moccasin`, `suimove`) are the original dev containers — no egress firewall, no scoped sudo, no `lair` support — so use them with code you trust.
 
 ## Quickstart - VSCode and Foundry on a new project, unmounted
 
