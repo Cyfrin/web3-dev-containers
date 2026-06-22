@@ -1,45 +1,38 @@
 {
-    // Inspired by https://blog.theredguild.org/where-do-you-run-your-code/
-    // For format details, see https://aka.ms/devcontainer.json.
-    "name": "Cyfrin's Claude DevContainer",
-    // You can use image or directly use a Dockerfile or Docker Compose file.
-    // More info: https://containers.dev/guide/dockerfile
-    // https://github.com/devcontainers/images/tree/main/src/base-alpine
-    // "image": "mcr.microsoft.com/devcontainers/base:debian",
-    "build": {
-        "dockerfile": "Dockerfile"
-    },
-    // Features to add to the dev container. More info: https://containers.dev/features.
-    "features": {},
-    // Configure tool-specific properties.
-    "customizations": {
-        // Configure properties specific to VS Code.
-        "vscode": {
-            "extensions": [],
-            "settings": {
-                "terminal.integrated.defaultProfile.linux": "zsh",
-                "terminal.integrated.profiles.linux": {
-                    "zsh": {
-                        "path": "/usr/bin/zsh"
-                    }
-                }
-            }
-        }
-    },
-    // Use 'forwardPorts' to make a list of ports inside the container available locally.
-    // "forwardPorts": [3000],
-    // Use 'portsAttributes' to set default properties for specific forwarded ports.
-    // More info: https://containers.dev/implementors/json_reference/#port-attributes
-    // "portsAttributes": {
-    // 	"3000": {
-    // 		"label": "Hello Remote World",
-    // 		"onAutoForward": "notify"
-    // 	}
-    // },
-    // Use 'postCreateCommand' to run commands after the container is created.
-    // We're using a gist, but you can also reference the raw install-tool from your repo.
-    // Unless you mount the scripts folder as
-    "postCreateCommand": "echo Welcome to Cyfrin's dev-container. If you'd like to build your own, you can check out an article Cyfrin have created for you at their blog under https://www.cyfrin.io/blog/reduce-the-risk-of-cyber-attacks-isolated-dev-environments;zsh"
-    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-    // "remoteUser": "root"
+  // Inspired by The Red Guild — https://blog.theredguild.org/where-do-you-run-your-code/
+  // Hardening patterns adapted from Trail of Bits (MIT) and Anthropic's reference devcontainer.
+  "name": "Cyfrin Claude (mounted, hardened)",
+  "build": {
+    "dockerfile": "../../Dockerfile",
+    "context": "../..",
+    "args": { "TZ": "${localEnv:TZ:UTC}" }
+  },
+  "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
+  "waitFor": "postStartCommand",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
+  "workspaceFolder": "/workspace",
+  "init": true,
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "customizations": {
+    "vscode": {
+      "extensions": ["anthropic.claude-code"],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
+      }
+    }
+  },
+  "mounts": [
+    "source=devc-${localWorkspaceFolderBasename}-claude-history-${devcontainerId},target=/commandhistory,type=volume",
+    "source=devc-${localWorkspaceFolderBasename}-claude-config-${devcontainerId},target=/home/vscode/.claude,type=volume",
+    "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly"
+  ],
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude",
+    "GIT_CONFIG_GLOBAL": "/home/vscode/.gitconfig.local",
+    "SSH_AUTH_SOCK": ""
+  },
+  "postCreateCommand": "uv run --no-project /opt/post_install.py; echo 'Cyfrin Claude dev container ready (no credentials). Run: claude login — https://www.cyfrin.io/blog/reduce-the-risk-of-cyber-attacks-isolated-dev-environments'"
 }

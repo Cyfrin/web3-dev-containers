@@ -18,6 +18,7 @@ You can read more about the importance of sandboxing, containers vs VMs, and mor
   - [Requirements](#requirements)
   - [Optional VSCode Requirements](#optional-vscode-requirements)
   - [Installation](#installation)
+  - [Claude container and the `lair` CLI](#claude-container-and-the-lair-cli)
   - [Quickstart - VSCode and Foundry on a new project, unmounted](#quickstart---vscode-and-foundry-on-a-new-project-unmounted)
 - [Usage](#usage)
   - [VSCode](#vscode)
@@ -92,6 +93,49 @@ Please see [VSCode](#VSCode) or [Raw Docker](#Raw-Docker) for more detailed inst
 git clone https://github.com/Cyfrin/web3-dev-containers
 cd web3-dev-containers
 ```
+
+## Claude container and the `lair` CLI
+
+The `claude/` stack runs Claude Code in a hardened sandbox — zero host credentials, no sudo, and a default-deny network by default (see [`claude/SECURITY.md`](./claude/SECURITY.md) for the threat model). `lair` is a small CLI that scaffolds a stack's `.devcontainer` into a project and opens it.
+
+**Prerequisites:** Docker (running) and the devcontainer CLI:
+
+```bash
+npm install -g @devcontainers/cli
+```
+
+**Install `lair`:**
+
+```bash
+git clone https://github.com/Cyfrin/web3-dev-containers ~/web3-dev-containers
+~/web3-dev-containers/lair self-install   # symlinks lair into ~/.local/bin
+```
+
+(Make sure `~/.local/bin` is on your `PATH`.)
+
+**Basic usage** — `lair [mounted|unmounted] <stack> [name] [flags]`:
+
+```bash
+lair claude                    # ephemeral tmpfs container in a throwaway dir
+lair mounted claude my-audit   # ./my-audit, work persists to your host
+lair shell                     # shell into the current project's container
+lair rebuild                   # rebuild it (lair down to stop; lair help for all)
+lair allow rpc.example.com     # add a host to the firewall (run inside a project)
+```
+
+It opens VS Code/Cursor if found (use **Reopen in Container** if it doesn't auto-prompt), otherwise gives you a headless shell. The container starts **logged out** — run `claude login` inside when you're ready.
+
+**Credentials are opt-in** (none by default). Add only what you need:
+
+```bash
+lair mounted claude p --auth   # forward your host Claude token
+lair mounted claude p --gh     # GitHub CLI + auth
+lair mounted claude p --rpc https://eth-mainnet.g.alchemy.com/v2/KEY   # allowlist an RPC host
+```
+
+For untrusted code, prefer **`unmounted`** (the default) and the CLI over the VS Code app. More opt-ins (`--git-ro`, `--ssh`, `--sudo`, `--mount`, `--git-identity`) and the full rationale live in [`claude/SECURITY.md`](./claude/SECURITY.md). The `claude` stack's pinned base image, tools, and Foundry version are kept current automatically by [Renovate](https://docs.renovatebot.com).
+
+> **Stack status:** Only `claude` is hardened and `lair`-ready today. The other stacks documented below (`foundry`, `javascript`, `moccasin`, `suimove`) are the original dev containers — no egress firewall, no scoped sudo, no `lair` support — so use them with code you trust.
 
 ## Quickstart - VSCode and Foundry on a new project, unmounted
 

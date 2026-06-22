@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "schedule": ["before 9am on monday"],
+  "minimumReleaseAge": "7 days",
+  "ignorePaths": ["claude-code-devcontainer/**"],
+  "packageRules": [
+    {
+      "description": "Group all updates into a single PR",
+      "matchPackageNames": ["*"],
+      "groupName": "all dependencies",
+      "groupSlug": "all"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Pinned ARG tool versions in Dockerfiles",
+      "fileMatch": ["(^|/)Dockerfile$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)\\n(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\n"
+      ],
+      "extractVersionTemplate": "^v?(?<version>.+)$"
+    }
+  ]
+}
