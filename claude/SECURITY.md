@@ -70,18 +70,25 @@ headless CLI with no flags.**
 
 ## Credentials (opt-in)
 
-Everything below is **off by default**. The `lair` CLI exposes these as flags
-(`--ssh`/`--sudo` are still manual — Phase 3.1); the manual equivalent is shown too.
+Everything below is **off by default** — the container boots with none. The `lair`
+CLI adds exactly what you ask for, writing the flag into the generated config so you
+can always read your posture.
 
-| Opt-in | Grants | Risk | Manual equivalent today |
-|--------|--------|------|-------------------------|
-| `--auth` | Claude auth (forwards host token) | API usage billed to your token | run `claude login` inside |
-| `--git-identity` | `~/.gitconfig` (read-only) | identity / signing-key exposure | add a read-only bind mount |
-| `--gh` | `gh` CLI + its auth volume | a GitHub token lives in the container | install `gh`; `gh auth login` |
-| `--ssh` | host SSH agent + opens port 22 | code can act as you over SSH (highest) | forward `SSH_AUTH_SOCK`; allow 22 |
-| `--allow <host>` / `--rpc <url>` | firewall allowlist entry | an egress hole (+ API key if RPC) | edit the allowlist file (below) |
-| `--sudo` | blanket passwordless sudo | **voids the firewall** — trusted code only | edit sudoers |
-| `--mount <src> <dst>` | bind mount | host data access | add a bind mount |
+| Opt-in | Grants | Risk |
+|--------|--------|------|
+| `--auth` | Claude auth (forwards host token; else `claude login` inside) | API usage billed to your token |
+| `--git-identity` | `~/.gitconfig` (read-only) | identity / signing-key exposure |
+| `--git-ro` | the whole `.git` read-only | no in-container commits; mounted + a git repo only |
+| `--gh` | `gh` CLI + its auth volume | a GitHub token lives in the container |
+| `--ssh` | host SSH agent + SSH (22) to allowlisted hosts | code can act as you over SSH (highest) |
+| `--allow <host>` / `--rpc <url>` | a firewall allowlist entry | an egress hole (+ API key if RPC) |
+| `--sudo` | blanket passwordless sudo | **voids the firewall** — trusted code only |
+| `--mount <host>:<container>` | bind mount | host data access |
+
+`--git-ro` only closes the git-hook/config vector; it does **not** make `mounted`
+airtight (`package.json` scripts, `Makefile`, `.envrc`, editor tasks still run on
+your host). For untrusted code, use `unmounted`. `--ssh` forwards `${SSH_AUTH_SOCK}`;
+on Docker Desktop you may need to point it at `/run/host-services/ssh-auth.sock`.
 
 ### Claude auth — review before you authenticate
 
@@ -104,8 +111,9 @@ egress rather than leaving it open. Allowed by default:
 - **DNS** only to the resolver(s) in `/etc/resolv.conf` (not arbitrary hosts — blocks DNS tunneling), plus loopback
 
 Only **ports 80 and 443** are allowed to allowlisted hosts — which is what blocks
-outbound **SSH (port 22)** and everything else by default. **IPv6 is sealed
-entirely** (the allowlist is IPv4-only, so all v6 egress is dropped).
+outbound **SSH (port 22)** and everything else by default (`lair --ssh` opens 22 to
+the allowlist). **IPv6 is sealed entirely** (the allowlist is IPv4-only, so all v6
+egress is dropped).
 
 ### Blockchain RPC (Alchemy, Infura, your own node)
 

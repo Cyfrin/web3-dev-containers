@@ -114,6 +114,13 @@ gw="$(ip route 2>/dev/null | awk '/^default/ {print $3; exit}')"
 # blocks outbound SSH (22) and every other port by default.
 iptables -A OUTPUT -p tcp -m multiport --dports 80,443 -m set --match-set allowed-domains dst -j ACCEPT
 
+# Optional: allow SSH (22) to allowlisted hosts (e.g. git push to github) when the
+# host opted in via `lair --ssh`. The marker is a root-owned, read-only bind mount.
+if [[ -f /etc/devcontainer/allow-ssh ]]; then
+  iptables -A OUTPUT -p tcp --dport 22 -m set --match-set allowed-domains dst -j ACCEPT
+  echo "init-firewall: SSH (22) to allowlisted hosts enabled"
+fi
+
 # Lock down.
 iptables -P INPUT DROP
 iptables -P FORWARD DROP

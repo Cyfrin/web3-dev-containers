@@ -4,10 +4,11 @@
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.foundry/bin:$PATH"
 
-# Never trust a forwarded host SSH agent inside the container (defense in depth;
-# also set in devcontainer.json). Empty, not unset, to block fallback to default
-# socket paths. Removing this re-enables host SSH auth for trusted work only.
-export SSH_AUTH_SOCK=
+# By default, don't trust a forwarded host SSH agent (defense in depth; also set
+# empty in devcontainer.json). Empty, not unset, to block fallback to default
+# socket paths. `lair --ssh` opts in by setting SSH_AUTH_SOCK=/ssh-agent, which
+# this preserves.
+[[ "${SSH_AUTH_SOCK:-}" == /ssh-agent ]] || export SSH_AUTH_SOCK=
 
 # fnm (Node)
 export FNM_DIR="$HOME/.fnm"

@@ -83,11 +83,14 @@ Stacks: $(list_stacks | paste -sd ' ' -)
 Credential / network opt-ins (off by default):
   --auth            forward host Claude token (else run 'claude login' inside)
   --git-identity    mount ~/.gitconfig read-only
+  --git-ro          mount the whole .git read-only; blocks host-hook planting but
+                    disables in-container commits (mounted variant + a git repo)
   --gh              add GitHub CLI + its auth volume
+  --ssh             forward the host SSH agent + allow git over SSH (port 22)
   --rpc <url>       allowlist an RPC host (e.g. Alchemy); keep the key in .env
   --allow <host>    allowlist an extra host in the firewall
   --mount <s:d>     bind-mount host path s to container path d
-  --ssh / --sudo    NOT YET (Phase 3.1) - see claude/SECURITY.md for manual steps
+  --sudo            restore blanket sudo; VOIDS the firewall (trusted code only)
 
 Examples:
   lair claude                         # unmounted claude, throwaway dir
@@ -170,8 +173,27 @@ apply_flags() {
       allow_hosts+=("$2")
       shift 2
       ;;
-    --ssh | --sudo)
-      warn "$1 is not implemented yet (Phase 3.1); see claude/SECURITY.md for the manual steps."
+    --git-ro)
+      jq_edit "$json" '.mounts = ((.mounts // []) + ["source=${localWorkspaceFolder}/.git,target=/workspace/.git,type=bind,readonly"])'
+      enabled+=(git-ro)
+      shift
+      ;;
+    --ssh)
+      [[ -n "${SSH_AUTH_SOCK:-}" ]] || warn "--ssh: no SSH_AUTH_SOCK on the host; agent forwarding may not work."
+      : >"$dc/allow-ssh"
+      jq_edit "$json" '
+        .containerEnv = ((.containerEnv // {}) + {"SSH_AUTH_SOCK": "/ssh-agent"})
+        | .mounts = ((.mounts // []) + [
+            "source=${localEnv:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
+            "source=${localWorkspaceFolder}/.devcontainer/allow-ssh,target=/etc/devcontainer/allow-ssh,type=bind,readonly"
+          ])'
+      enabled+=(ssh)
+      shift
+      ;;
+    --sudo)
+      warn "--sudo restores blanket sudo - this VOIDS the firewall (code can flush it). Trusted code only."
+      jq_edit "$json" '.build.args = ((.build.args // {}) + {"LAIR_SUDO": "true"})'
+      enabled+=(sudo)
       shift
       ;;
     *) die "unknown flag: $1" ;;

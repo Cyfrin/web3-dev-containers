@@ -93,14 +93,16 @@ ENV NPM_CONFIG_IGNORE_SCRIPTS=true \
 # Egress firewall: install the script and replace the base image's blanket
 # passwordless sudo with a single scoped rule. vscode may run ONLY the firewall
 # as root, so untrusted code can neither flush iptables nor edit the root-owned
-# allowlist. Restoring general sudo voids that guarantee (see claude/SECURITY.md).
+# allowlist. `lair --sudo` (LAIR_SUDO=true) keeps blanket sudo for trusted work,
+# which voids that guarantee (see claude/SECURITY.md).
+ARG LAIR_SUDO=false
 COPY init-firewall.sh /usr/local/bin/init-firewall.sh
 RUN chmod 0755 /usr/local/bin/init-firewall.sh \
   && mkdir -p /etc/devcontainer \
-  && rm -f /etc/sudoers.d/vscode \
   && echo 'vscode ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh' >/etc/sudoers.d/vscode-firewall \
   && chmod 0440 /etc/sudoers.d/vscode-firewall \
-  && visudo -cf /etc/sudoers.d/vscode-firewall
+  && visudo -cf /etc/sudoers.d/vscode-firewall \
+  && if [ "${LAIR_SUDO}" != "true" ]; then rm -f /etc/sudoers.d/vscode; fi
 
 WORKDIR /workspace
 USER vscode
