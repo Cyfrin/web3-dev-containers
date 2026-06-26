@@ -51,6 +51,8 @@ fi
 domains=(
   api.anthropic.com claude.ai console.anthropic.com statsig.anthropic.com
   registry.npmjs.org pypi.org files.pythonhosted.org
+  sh.rustup.rs static.rust-lang.org crates.io static.crates.io index.crates.io
+  binaries.soliditylang.org
   github.com raw.githubusercontent.com objects.githubusercontent.com codeload.github.com
 )
 # Opt-in extra hosts, root-owned, written from the host (e.g. `lair allow`).
