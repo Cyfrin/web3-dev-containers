@@ -312,9 +312,13 @@ cmd_lifecycle() {
 
 cmd_self_install() {
   local bin="$HOME/.local/bin"
+  # Link the canonical script in the repo (absolute), NOT $SOURCE: the
+  # resolution loop above leaves $SOURCE as the last readlink target, which may
+  # be relative (e.g. "./lair") and would create a self-referential symlink.
+  local target="$REPO_ROOT/lair"
   mkdir -p "$bin"
-  ln -sf "$SOURCE" "$bin/lair"
-  log "installed: $bin/lair -> $SOURCE"
+  ln -sf "$target" "$bin/lair"
+  log "installed: $bin/lair -> $target"
   case ":$PATH:" in
   *":$bin:"*) ;;
   *) warn "$bin is not on PATH; add: export PATH=\"\$HOME/.local/bin:\$PATH\"" ;;
