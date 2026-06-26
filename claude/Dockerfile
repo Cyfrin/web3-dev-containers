@@ -121,6 +121,21 @@ RUN curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$FNM_D
   && fnm install "${NODE_VERSION}" \
   && fnm default "${NODE_VERSION}"
 
+# Rust toolchain via rustup (minimal profile + clippy/rustfmt). Pinned and kept
+# current by Renovate; the rustup installer verifies the downloaded toolchain
+# against static.rust-lang.org checksums. Common in web3 tooling (building crates
+# from source, `cargo install`).
+# renovate: datasource=github-releases depName=rust-lang/rust
+ARG RUST_VERSION=1.96.0
+ENV RUSTUP_HOME="/home/vscode/.rustup" \
+    CARGO_HOME="/home/vscode/.cargo"
+ENV PATH="/home/vscode/.cargo/bin:$PATH"
+RUN curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs \
+      | sh -s -- -y --no-modify-path --profile minimal --default-toolchain "${RUST_VERSION}" \
+  && rustup component add clippy rustfmt \
+  && rustc --version \
+  && cargo --version
+
 # Foundry (pinned stable; prebuilt glibc binaries verified against release attestations)
 # renovate: datasource=github-releases depName=foundry-rs/foundry
 ARG FOUNDRY_VERSION=v1.7.1

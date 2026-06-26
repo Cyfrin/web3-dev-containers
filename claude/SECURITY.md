@@ -107,6 +107,8 @@ egress rather than leaving it open. Allowed by default:
 
 - **Anthropic:** `api.anthropic.com`, `claude.ai`, `console.anthropic.com`, `statsig.anthropic.com`
 - **Registries:** `registry.npmjs.org`, `pypi.org`, `files.pythonhosted.org`
+- **Rust:** `sh.rustup.rs` (rustup installer), `static.rust-lang.org` (rustup toolchains), `crates.io`, `static.crates.io`, `index.crates.io` (cargo registry + crate downloads)
+- **Solidity:** `binaries.soliditylang.org` (solc compiler downloads via `solc-select` / Foundry)
 - **GitHub:** `github.com`, `raw.githubusercontent.com`, `objects.githubusercontent.com`, `codeload.github.com`, plus GitHub's `api`/`git` IP ranges (the `.web`/Pages range is excluded so it can't be used as an exfil target)
 - **DNS** only to the resolver(s) in `/etc/resolv.conf` (not arbitrary hosts — blocks DNS tunneling), plus loopback
 

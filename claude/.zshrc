@@ -3,6 +3,7 @@
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.foundry/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # By default, don't trust a forwarded host SSH agent (defense in depth; also set
 # empty in devcontainer.json). Empty, not unset, to block fallback to default
