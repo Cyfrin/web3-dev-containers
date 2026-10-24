@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # git-delta (better diffs / pager)
 # renovate: datasource=github-releases depName=dandavison/delta
-ARG GIT_DELTA_VERSION=0.19.2
+ARG GIT_DELTA_VERSION=0.20.1
 RUN ARCH="$(dpkg --print-architecture)" \
   && curl -fsSL "https://github.com/dandavison/delta/releases/download/${GIT_DELTA_VERSION}/git-delta_${GIT_DELTA_VERSION}_${ARCH}.deb" -o /tmp/git-delta.deb \
   && dpkg -i /tmp/git-delta.deb \
@@ -55,7 +55,7 @@ RUN ARCH="$(dpkg --print-architecture)" \
 
 # fzf (newer than apt; ships shell integration)
 # renovate: datasource=github-releases depName=junegunn/fzf
-ARG FZF_VERSION=0.73.1
+ARG FZF_VERSION=0.74.5
 RUN ARCH="$(dpkg --print-architecture)" \
   && case "${ARCH}" in \
        amd64) FZF_ARCH="linux_amd64" ;; \
@@ -126,7 +126,7 @@ RUN curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$FNM_D
 # against static.rust-lang.org checksums. Common in web3 tooling (building crates
 # from source, `cargo install`).
 # renovate: datasource=github-releases depName=rust-lang/rust
-ARG RUST_VERSION=1.96.0
+ARG RUST_VERSION=1.99.1
 ENV RUSTUP_HOME="/home/vscode/.rustup" \
     CARGO_HOME="/home/vscode/.cargo"
 ENV PATH="/home/vscode/.cargo/bin:$PATH"
@@ -138,7 +138,7 @@ RUN curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs \
 
 # Foundry (pinned stable; prebuilt glibc binaries verified against release attestations)
 # renovate: datasource=github-releases depName=foundry-rs/foundry
-ARG FOUNDRY_VERSION=v1.7.1
+ARG FOUNDRY_VERSION=1.8.5
 ENV PATH="/home/vscode/.foundry/bin:$PATH"
 RUN curl -fsSL https://foundry.paradigm.xyz | bash \
   && /home/vscode/.foundry/bin/foundryup --install "${FOUNDRY_VERSION}"
